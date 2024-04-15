@@ -1,3 +1,8 @@
+import random
+
+randomize(123)
+
+
 ### How do tuples look like in C? Like structs!
 echo "--- tuples test ---"
 
@@ -38,16 +43,20 @@ proc maybeMatch(response: Response, success: proc (value: int), failure: proc(ex
     case response.kind
     of responseValue: success(response.value)
     of responseException: failure(response.exception)
-    
+
+
+proc useCaseCodeReturningResponse(): Response =
+    # simulating lower level code called, resulting in either succesful value or potential exception
+    if rand(1) == 1:
+        Response(kind: responseValue, value: 1337)
+    else:
+        Response(kind: responseException, exception: "Caught some runtime exception!")
+
 proc success(value: int) =
     echo "Success: ", value
 
 proc failure(exception: string) =
     echo "Failure: ", exception
 
-var
-    response1 = Response(kind: responseValue, value: 1337)
-    response2 = Response(kind: responseException, exception: "Caught some runtime exception!")
-
-response1.maybeMatch(success, failure) # todo: inline closures possible?
-response2.maybeMatch(success, failure)
+for i in 0..4:
+    useCaseCodeReturningResponse().maybeMatch(success, failure) # todo: inline closures possible?
